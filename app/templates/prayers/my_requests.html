@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}My Prayer Requests - Pray Noel{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">My Prayer Requests</h1>
+            <p class="text-gray-600">Manage your shared requests</p>
+        </div>
+        <a href="{{ url_for('prayers.create') }}" 
+           class="inline-flex items-center px-6 py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+            <i class="fas fa-plus mr-2"></i>New Request
+        </a>
+    </div>
+    
+    <div class="space-y-6">
+        {% for request in requests %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                        {{ request.category }}
+                    </span>
+                    {% if request.is_answered %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>Answered
+                    </span>
+                    {% endif %}
+                    {% if request.is_private %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        <i class="fas fa-lock mr-1"></i>Private
+                    </span>
+                    {% endif %}
+                </div>
+                <span class="text-sm text-gray-500">{{ request.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ request.title }}</h3>
+            <p class="text-gray-700 mb-4 line-clamp-3">{{ request.content }}</p>
+            
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>
+                        <i class="fas fa-praying-hands text-emerald-600 mr-1"></i>
+                        <strong>{{ request.prayer_count }}</strong> prayers
+                    </span>
+                    <span>
+                        <i class="fas fa-comment text-blue-600 mr-1"></i>
+                        <strong>{{ request.encouragements|length }}</strong> encouragements
+                    </span>
+                </div>
+                <a href="{{ url_for('prayers.view', id=request.id) }}" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">
+                    View Details
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-12 bg-white rounded-xl border border-gray-100">
+            <i class="fas fa-hands-praying text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500 mb-4">You haven't submitted any prayer requests yet.</p>
+            <a href="{{ url_for('prayers.create') }}" 
+               class="inline-flex items-center px-6 py-3 rounded-lg bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition">
+                <i class="fas fa-plus mr-2"></i>Submit Your First Request
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

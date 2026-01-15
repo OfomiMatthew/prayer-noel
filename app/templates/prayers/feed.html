@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Prayer Feed - Pray Noel{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-4xl font-serif font-bold text-gray-900 mb-2">Prayer Feed</h1>
+        <p class="text-gray-600">Browse and pray for requests from our community</p>
+    </div>
+    
+    <!-- Filters -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ url_for('prayers.feed', category='all', sort=current_sort) }}" 
+                   class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_category == 'all' %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    All
+                </a>
+                {% for cat in categories %}
+                <a href="{{ url_for('prayers.feed', category=cat, sort=current_sort) }}" 
+                   class="px-4 py-2 rounded-lg text-sm font-medium transition {% if current_category == cat %}bg-emerald-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                    {{ cat }}
+                </a>
+                {% endfor %}
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <span class="text-sm text-gray-600">Sort by:</span>
+                <select onchange="window.location.href='{{ url_for('prayers.feed', category=current_category) }}' + '&sort=' + this.value" 
+                        class="px-3 py-2 rounded-lg border border-gray-300 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    <option value="recent" {% if current_sort == 'recent' %}selected{% endif %}>Most Recent</option>
+                    <option value="most_prayed" {% if current_sort == 'most_prayed' %}selected{% endif %}>Most Prayed</option>
+                    <option value="urgent" {% if current_sort == 'urgent' %}selected{% endif %}>Urgent</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Prayer Requests -->
+    <div class="space-y-6">
+        {% for request in requests %}
+        <div class="prayer-card bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:border-emerald-200">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                        {{ request.category }}
+                    </span>
+                    {% if request.is_urgent %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        <i class="fas fa-exclamation-circle mr-1"></i>Urgent
+                    </span>
+                    {% endif %}
+                    {% if request.is_answered %}
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <i class="fas fa-check-circle mr-1"></i>Answered
+                    </span>
+                    {% endif %}
+                </div>
+                <span class="text-sm text-gray-500">{{ request.created_at.strftime('%b %d, %Y') }}</span>
+            </div>
+            
+            <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ request.title }}</h3>
+            <p class="text-gray-700 mb-4 leading-relaxed">{{ request.content[:300] }}{% if request.content|length > 300 %}...{% endif %}</p>
+            
+            {% if request.bible_verse %}
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-3 mb-4">
+                <p class="text-sm italic text-gray-700">{{ request.bible_verse }}</p>
+            </div>
+            {% endif %}
+            
+            <div class="flex items-center justify-between pt-4 border-t border-gray-100">
+                <div class="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>
+                        <i class="fas fa-praying-hands text-emerald-600 mr-1"></i>
+                        <strong>{{ request.prayer_count }}</strong> prayers
+                    </span>
+                    <span>by {{ request.display_name }}</span>
+                </div>
+                <a href="{{ url_for('prayers.view', id=request.id) }}" 
+                   class="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">
+                    <i class="fas fa-praying-hands mr-2"></i>
+                    View & Pray
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-dove text-5xl text-gray-300 mb-4"></i>
+            <p class="text-gray-500">No prayer requests found in this category.</p>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Pagination -->
+    {% if pagination.pages > 1 %}
+    <div class="mt-8 flex justify-center">
+        <nav class="inline-flex rounded-lg shadow-sm">
+            {% if pagination.has_prev %}
+            <a href="{{ url_for('prayers.feed', page=pagination.prev_num, category=current_category, sort=current_sort) }}" 
+               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-50">
+                Previous
+            </a>
+            {% endif %}
+            
+            {% for page in pagination.iter_pages() %}
+                {% if page %}
+                    <a href="{{ url_for('prayers.feed', page=page, category=current_category, sort=current_sort) }}" 
+                       class="px-4 py-2 text-sm font-medium {% if page == pagination.page %}text-white bg-emerald-600{% else %}text-gray-700 bg-white hover:bg-gray-50{% endif %} border border-gray-300">
+                        {{ page }}
+                    </a>
+                {% else %}
+                    <span class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300">...</span>
+                {% endif %}
+            {% endfor %}
+            
+            {% if pagination.has_next %}
+            <a href="{{ url_for('prayers.feed', page=pagination.next_num, category=current_category, sort=current_sort) }}" 
+               class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-r-lg hover:bg-gray-50">
+                Next
+            </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

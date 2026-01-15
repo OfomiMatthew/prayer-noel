@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Pray Noel{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-serif font-bold text-gray-900 mb-2">Admin Dashboard</h1>
+        <p class="text-gray-600">Manage and moderate the prayer community</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Users</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_users }}</p>
+                </div>
+                <i class="fas fa-users text-3xl text-blue-600"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Requests</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_requests }}</p>
+                </div>
+                <i class="fas fa-list text-3xl text-emerald-600"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Pending Reports</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ pending_reports }}</p>
+                </div>
+                <i class="fas fa-flag text-3xl text-red-600"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <a href="{{ url_for('admin.featured_prayer') }}" class="flex items-center justify-between hover:bg-gray-50 transition rounded-lg p-2 -m-2">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Featured Prayer</p>
+                    <p class="text-lg font-semibold text-gray-900">Manage</p>
+                </div>
+                <i class="fas fa-star text-3xl text-amber-600"></i>
+            </a>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <a href="{{ url_for('admin.reports') }}" 
+           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:border-emerald-300 transition">
+            <i class="fas fa-flag text-2xl text-red-600 mb-3"></i>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Review Reports</h3>
+            <p class="text-sm text-gray-600">Moderate flagged content</p>
+        </a>
+        
+        <a href="{{ url_for('admin.requests') }}" 
+           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:border-emerald-300 transition">
+            <i class="fas fa-list text-2xl text-emerald-600 mb-3"></i>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Manage Requests</h3>
+            <p class="text-sm text-gray-600">View all prayer requests</p>
+        </a>
+        
+        <a href="{{ url_for('admin.users') }}" 
+           class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:border-emerald-300 transition">
+            <i class="fas fa-users text-2xl text-blue-600 mb-3"></i>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">User Management</h3>
+            <p class="text-sm text-gray-600">Manage user accounts</p>
+        </a>
+    </div>
+    
+    <!-- Recent Prayer Requests -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-6">Recent Prayer Requests</h2>
+        
+        <div class="space-y-4">
+            {% for request in recent_requests %}
+            <div class="border-b border-gray-100 pb-4 last:border-0">
+                <div class="flex items-start justify-between">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-100 text-emerald-800">
+                                {{ request.category }}
+                            </span>
+                            {% if not request.is_public %}
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                                Hidden
+                            </span>
+                            {% endif %}
+                        </div>
+                        <a href="{{ url_for('prayers.view', id=request.id) }}" 
+                           class="text-lg font-medium text-gray-900 hover:text-emerald-600">
+                            {{ request.title }}
+                        </a>
+                        <p class="text-sm text-gray-600 mt-1">
+                            by {{ request.display_name }} • {{ request.created_at.strftime('%b %d, %Y') }}
+                        </p>
+                    </div>
+                    <div class="ml-4 text-right">
+                        <span class="text-sm text-gray-600">
+                            <i class="fas fa-praying-hands text-emerald-600"></i> {{ request.prayer_count }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Prayer Tree - Pray Noel{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-emerald-900 to-emerald-950 py-16">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+            <h1 class="text-5xl font-serif font-bold text-white mb-4">Community Prayer Tree</h1>
+            <p class="text-xl text-emerald-100">Each light represents a prayer offered by our community</p>
+            <div class="mt-6">
+                <span class="inline-flex items-center px-6 py-3 rounded-full bg-white/20 backdrop-blur-sm text-white text-lg font-semibold">
+                    <i class="fas fa-praying-hands mr-3"></i>
+                    {{ total_prayers }} Prayers Lighting Our Tree
+                </span>
+            </div>
+        </div>
+        
+        <!-- Prayer Tree Visualization -->
+        <div class="relative mx-auto" style="max-width: 500px;">
+            <!-- Tree SVG -->
+            <svg viewBox="0 0 200 300" class="w-full" id="prayer-tree">
+                <!-- Tree trunk -->
+                <rect x="85" y="240" width="30" height="60" fill="#8B4513" />
+                
+                <!-- Tree layers -->
+                <path d="M 100 20 L 170 80 L 150 80 L 200 140 L 175 140 L 220 200 L 180 200 L 220 260 L -20 260 L 20 200 L -20 200 L 25 140 L 0 140 L 50 80 L 30 80 Z" 
+                      fill="#0f5b3a" 
+                      stroke="#0a4128" 
+                      stroke-width="2"/>
+                
+                <!-- Star on top -->
+                <path d="M 100 0 L 105 15 L 120 15 L 108 25 L 113 40 L 100 30 L 87 40 L 92 25 L 80 15 L 95 15 Z" 
+                      fill="#FFD700" 
+                      stroke="#FFA500" 
+                      stroke-width="1.5"/>
+                
+                <!-- Prayer lights (will be added dynamically) -->
+                <g id="lights-container">
+                    <!-- Lights will be generated here -->
+                </g>
+            </svg>
+        </div>
+        
+        <!-- Legend -->
+        <div class="mt-12 bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+            <h2 class="text-2xl font-serif font-bold text-white mb-6 text-center">Prayer Categories</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-red-400"></div>
+                    <span class="text-white">Health ({{ category_counts.get('Health', 0) }})</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-blue-400"></div>
+                    <span class="text-white">Family ({{ category_counts.get('Family', 0) }})</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-green-400"></div>
+                    <span class="text-white">Finances ({{ category_counts.get('Finances', 0) }})</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-pink-400"></div>
+                    <span class="text-white">Relationships ({{ category_counts.get('Relationships', 0) }})</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-purple-400"></div>
+                    <span class="text-white">Grief ({{ category_counts.get('Grief', 0) }})</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <div class="w-4 h-4 rounded-full bg-yellow-400"></div>
+                    <span class="text-white">Gratitude ({{ category_counts.get('Gratitude', 0) }})</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action -->
+        <div class="mt-12 text-center">
+            <p class="text-white text-lg mb-6">Add your light to the tree by praying for someone today!</p>
+            <a href="{{ url_for('prayers.feed') }}" 
+               class="inline-flex items-center px-8 py-4 rounded-lg bg-white text-emerald-900 font-bold hover:bg-emerald-50 transition shadow-lg text-lg">
+                <i class="fas fa-praying-hands mr-3"></i>
+                Browse Prayer Requests
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Generate prayer lights on the tree
+    const categoryColors = {
+        'Health': '#f87171',
+        'Family': '#60a5fa',
+        'Finances': '#4ade80',
+        'Relationships': '#f472b6',
+        'Grief': '#a78bfa',
+        'Gratitude': '#facc15'
+    };
+    
+    const totalPrayers = {{ total_prayers }};
+    const lightsContainer = document.getElementById('lights-container');
+    
+    // Generate light positions (triangular distribution to match tree shape)
+    const generateLights = () => {
+        const numLights = Math.min(totalPrayers, 100); // Cap at 100 for performance
+        
+        for (let i = 0; i < numLights; i++) {
+            const y = 30 + Math.random() * 210; // Y position from 30 to 240
+            const maxWidth = (y - 20) / 240 * 120; // Width increases as we go down
+            const x = 100 + (Math.random() - 0.5) * 2 * maxWidth;
+            
+            // Random category color
+            const categories = Object.keys(categoryColors);
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const color = categoryColors[category];
+            
+            // Create light circle
+            const light = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            light.setAttribute('cx', x);
+            light.setAttribute('cy', y);
+            light.setAttribute('r', 3);
+            light.setAttribute('fill', color);
+            light.setAttribute('class', 'prayer-light');
+            light.style.animation = `twinkle ${2 + Math.random() * 3}s infinite`;
+            light.style.animationDelay = `${Math.random() * 2}s`;
+            
+            lightsContainer.appendChild(light);
+        }
+    };
+    
+    generateLights();
+</script>
+
+<style>
+    @keyframes twinkle {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    .prayer-light {
+        filter: drop-shadow(0 0 3px currentColor);
+    }
+</style>
+{% endblock %}

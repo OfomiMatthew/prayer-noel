@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Christmas Eve Prayer - Pray Noel{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-b from-emerald-900 via-emerald-800 to-emerald-900 text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <i class="fas fa-dove text-6xl mb-8 animate-pulse"></i>
+        
+        <h1 class="text-5xl font-serif font-bold mb-6">Christmas Eve Global Prayer</h1>
+        <p class="text-2xl text-emerald-100 mb-12">
+            Join believers around the world in a moment of unified prayer
+        </p>
+        
+        <!-- Countdown Timer -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-12">
+            <h2 class="text-xl font-semibold mb-6">Prayer Time: December 24, 2025 - 8:00 PM</h2>
+            
+            <div id="countdown" class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-white/20 rounded-lg p-4">
+                    <div class="text-4xl font-bold" id="days">--</div>
+                    <div class="text-sm text-emerald-100">Days</div>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4">
+                    <div class="text-4xl font-bold" id="hours">--</div>
+                    <div class="text-sm text-emerald-100">Hours</div>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4">
+                    <div class="text-4xl font-bold" id="minutes">--</div>
+                    <div class="text-sm text-emerald-100">Minutes</div>
+                </div>
+                <div class="bg-white/20 rounded-lg p-4">
+                    <div class="text-4xl font-bold" id="seconds">--</div>
+                    <div class="text-sm text-emerald-100">Seconds</div>
+                </div>
+            </div>
+            
+            <p class="text-emerald-100">Set a reminder to join us in prayer!</p>
+        </div>
+        
+        <!-- Prayer Focus -->
+        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-12 text-left">
+            <h2 class="text-2xl font-serif font-bold mb-6 text-center">Prayer Focus</h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <i class="fas fa-peace text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Peace on Earth</h3>
+                        <p class="text-emerald-100">Pray for peace in nations, communities, and families</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <i class="fas fa-heart text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Reconciliation</h3>
+                        <p class="text-emerald-100">Pray for healing in broken relationships</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <i class="fas fa-hands-helping text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Those in Need</h3>
+                        <p class="text-emerald-100">Pray for the homeless, hungry, and hurting</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <i class="fas fa-star text-2xl mr-4 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Hope & Joy</h3>
+                        <p class="text-emerald-100">Pray for hope to fill hearts this Christmas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Scripture -->
+        <div class="bg-amber-500/20 backdrop-blur-sm rounded-2xl p-8 border-2 border-amber-400/50">
+            <blockquote class="text-2xl font-serif italic mb-4">
+                "For unto you is born this day in the city of David a Saviour, which is Christ the Lord."
+            </blockquote>
+            <p class="text-emerald-100">- Luke 2:11</p>
+        </div>
+        
+        <!-- Call to Action -->
+        <div class="mt-12">
+            <a href="{{ url_for('prayers.feed') }}" 
+               class="inline-flex items-center px-8 py-4 rounded-lg bg-white text-emerald-900 font-bold hover:bg-emerald-50 transition shadow-lg text-lg">
+                <i class="fas fa-praying-hands mr-3"></i>
+                Browse Prayer Requests
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Countdown Timer
+    const countdownDate = new Date("{{ prayer_time }}").getTime();
+    
+    const updateCountdown = () => {
+        const now = new Date().getTime();
+        const distance = countdownDate - now;
+        
+        if (distance < 0) {
+            document.getElementById('countdown').innerHTML = `
+                <div class="col-span-4 text-2xl font-semibold">
+                    <i class="fas fa-praying-hands mr-2"></i>
+                    It's Prayer Time! Join us in prayer now.
+                </div>
+            `;
+            return;
+        }
+        
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        document.getElementById('days').textContent = days;
+        document.getElementById('hours').textContent = hours;
+        document.getElementById('minutes').textContent = minutes;
+        document.getElementById('seconds').textContent = seconds;
+    };
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+</script>
+{% endblock %}
